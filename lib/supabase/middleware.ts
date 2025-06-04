@@ -1,25 +1,44 @@
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-
-// Используем глобальные переменные окружения из next.config.js
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+import { CookieOptions } from "@supabase/ssr";
 
 export async function updateSession(request: NextRequest) {
-  // Если переменные окружения не заданы, пропускаем проверку
-  if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.next({ request });
-  }
+  const response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  // Инициализируем Supabase клиент для Edge
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          });
+        },
+        remove(name: string, options: CookieOptions) {
+          response.cookies.set({
+            name,
+            value: "",
+            ...options,
+          });
+        },
+      },
+    }
+  );
 
-  // Получаем текущего пользователя
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Если пользователь не авторизован и пытается получить доступ к защищенным маршрутам, перенаправляем на страницу логина
   if (
     request.nextUrl.pathname !== "/" &&
     !user &&
@@ -31,6 +50,5 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Возвращаем NextResponse.next с текущим запросом
-  return NextResponse.next({ request });
+  return response;
 }
