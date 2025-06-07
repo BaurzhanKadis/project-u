@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { M_PLUS_1p } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-
+import { Header, Footer } from "@/components/layout";
+import { Container } from "@/components/shared/container";
+import { ProductProvider } from "@/components/providers/product-provider";
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "U-MERCH - Маркетплейс мерча",
+  description:
+    "U-MERCH — это платформа для розничных заказов мерча от 1 до 20 изделий с 2D и 3D конструктором дизайна",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  display: "swap",
-  subsets: ["latin"],
+const mPlus1p = M_PLUS_1p({
+  variable: "--font-m-plus-1p",
+  subsets: ["latin", "cyrillic"],
+  weight: ["100", "300", "400", "500", "700", "800", "900"],
 });
 
 export default function RootLayout({
@@ -26,15 +29,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+      <body className={`${mPlus1p.className} antialiased`}>
+        <ProductProvider>
+          <Header />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Container>
+              <main>{children}</main>
+            </Container>
+            <Footer />
+          </ThemeProvider>
+        </ProductProvider>
       </body>
     </html>
   );

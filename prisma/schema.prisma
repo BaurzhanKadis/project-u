@@ -1,0 +1,111 @@
+generator client {
+  provider        = "prisma-client-js"
+//   previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+// Роль пользователя
+enum UserRole {
+    USER
+    SELLER
+    ADMIN
+}
+// размер товара
+enum size {
+    S
+    M
+    L
+    XL
+    XXL
+    XXXL
+}
+// цвет товара
+enum color {
+    RED
+    BLUE
+    GREEN
+    YELLOW
+    ORANGE
+    PURPLE
+    PINK
+    GRAY
+    BLACK
+    WHITE
+}
+
+// пользователь
+model User {
+    id String @id @default(uuid())
+    email String @unique
+    password String
+    name String
+    image String
+    role UserRole @default(USER)
+
+    phone String
+    address String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    products Product[]
+}
+
+// товар
+model Product {
+    id String @id @default(uuid())
+    name String
+    description String
+    email String
+    password String
+    images Image[] // это поле для связи с изображением
+    image String
+    phone String
+    address String
+    
+    categoryId String
+    category Category @relation(fields: [categoryId], references: [id])
+
+    brandId String
+    brand Brand @relation(fields: [brandId], references: [id])
+
+    size size[]
+    color color[]
+    price Int
+    oldPrice Int
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    userId String? // это поле для связи с пользователем
+    user User? @relation(fields: [userId], references: [id]) // это поле для связи с пользователем
+}
+model Brand {
+    id String @id @default(uuid()) // это поле для идентификатора бренда
+    name String @unique // это поле для названия бренда
+    description String // это поле для описания бренда
+    image String // это поле для изображения бренда
+    slug String @unique // это поле для ссылки на бренд
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    products Product[]
+}
+model Category {
+    id String @id @default(uuid())
+    name String @unique
+    description String
+    image String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    products Product[]
+}
+model Image {       
+    id String @id @default(uuid()) // это поле для идентификатора изображения
+    url String // это поле для ссылки на изображение
+    createdAt DateTime @default(now()) // это поле для даты создания изображения
+    updatedAt DateTime @updatedAt // это поле для даты обновления изображения
+    productId String // это поле для связи с товаром
+    product Product @relation(fields: [productId], references: [id]) // это поле для связи с товаром
+}
