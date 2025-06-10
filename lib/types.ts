@@ -1,5 +1,3 @@
-import { User, Product, Order, Category, Brand, Review } from "@prisma/client";
-
 export interface Product {
   id: number;
   name: string;
@@ -61,38 +59,3 @@ export interface User {
   name: string;
   role: string;
 }
-
-export type SafeUser = Omit<User, "password"> & {
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type SafeProduct = Product & {
-  createdAt: string;
-  updatedAt: string;
-  category: Category;
-  brand: Brand;
-  seller: {
-    storeName: string;
-    rating: number | null;
-  };
-};
-
-export type SafeOrder = Order & {
-  createdAt: string;
-  updatedAt: string;
-  items: {
-    product: SafeProduct;
-    quantity: number;
-    priceAtTime: number;
-  }[];
-};
-
-export type SafeReview = Review & {
-  createdAt: string;
-  updatedAt: string;
-  user: {
-    fullName: string | null;
-    avatarUrl: string | null;
-  };
-};

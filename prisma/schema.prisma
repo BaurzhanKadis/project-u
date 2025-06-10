@@ -10,12 +10,29 @@ datasource db {
 }
 // Роль пользователя
 enum UserRole {
-    USER
-    SELLER
-    ADMIN
+    USER    // покупатель
+    SELLER  // продавец
+    ADMIN   // администратор
+}
+// Статус заказа
+enum OrderStatus {
+    PENDING     // ожидает оплаты
+    PAID        // оплачен
+    PROCESSING  // в обработке
+    SHIPPED     // отправлен
+    DELIVERED   // доставлен
+    CANCELLED   // отменен
+    REFUNDED    // возвращен
+}
+// Статус товара
+enum ProductStatus {
+    DRAFT       // черновик
+    ACTIVE      // активен
+    INACTIVE    // неактивен
+    OUT_OF_STOCK // нет в наличии
 }
 // размер товара
-enum size {
+enum Size {
     S
     M
     L
@@ -24,7 +41,7 @@ enum size {
     XXXL
 }
 // цвет товара
-enum color {
+enum Color {
     RED
     BLUE
     GREEN
@@ -39,73 +56,190 @@ enum color {
 
 // пользователь
 model User {
-    id String @id @default(uuid())
-    email String @unique
-    password String
-    name String
-    image String
-    role UserRole @default(USER)
+    id          String @id @default(uuid())
+    email       String @unique
+    password    String
+    name        String
+    image       String?
+    role        UserRole @default(USER)
 
-    phone String
-    address String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    phone       String?
+    address     String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
 
+    // Связи
+    sellerProfile SellerProfile?
+    orders        Order[]
+    reviews       Review[]
+    favorites     Favorite[]
+    cartItems     CartItem[]
+}
+
+// Профиль продавца
+model SellerProfile {
+    id          String   @id @default(uuid())
+    userId      String   @unique
+    user        User     @relation(fields: [userId], references: [id])
+    storeName   String
+    description String?
+    logoUrl     String?
+    rating      Float?
+    totalSales  Int      @default(0)
+    isVerified  Boolean  @default(false)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Связи
     products Product[]
 }
 
 // товар
 model Product {
-    id String @id @default(uuid())
-    name String
-    description String
-    email String
-    password String
-    images Image[] // это поле для связи с изображением
-    image String
-    phone String
-    address String
-    
-    categoryId String
-    category Category @relation(fields: [categoryId], references: [id])
+    id              String @id @default(uuid())
+    sellerId        String
+    seller          SellerProfile @relation(fields: [sellerId], references: [id])
+    categoryId      String
+    category        Category @relation(fields: [categoryId], references: [id])
+    brandId         String
+    brand           Brand @relation(fields: [brandId], references: [id])
+    name            String
+    slug            String @unique
+    description     String?
+    price           Float
+    oldPrice        Float?
+    stockQuantity   Int @default(0)
+    status          ProductStatus @default(DRAFT)
+    rating          Float?
+    totalReviews    Int @default(0)
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
 
-    brandId String
-    brand Brand @relation(fields: [brandId], references: [id])
-
-    size size[]
-    color color[]
-    price Int
-    oldPrice Int
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    userId String? // это поле для связи с пользователем
-    user User? @relation(fields: [userId], references: [id]) // это поле для связи с пользователем
+    // Связи
+    variants    ProductVariant[]
+    images      ProductImage[]
+    orderItems  OrderItem[]
+    reviews     Review[]
+    favorites   Favorite[]
+    cartItems   CartItem[]
 }
-model Brand {
-    id String @id @default(uuid()) // это поле для идентификатора бренда
-    name String @unique // это поле для названия бренда
-    description String // это поле для описания бренда
-    image String // это поле для изображения бренда
-    slug String @unique // это поле для ссылки на бренд
+
+// Вариант товара
+model ProductVariant {
+    id             String   @id @default(uuid())
+    productId      String
+    product        Product  @relation(fields: [productId], references: [id])
+    size           Size?
+    color          Color?
+    stockQuantity  Int      @default(0)
+    priceAdjustment Float   @default(0)
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+
+    // Связи
+    orderItems OrderItem[]
+    cartItems  CartItem[]
+}
+
+// Изображение товара
+model ProductImage {
+    id         String   @id @default(uuid())
+    productId  String
+    product    Product  @relation(fields: [productId], references: [id])
+    url        String
+    isPrimary  Boolean  @default(false)
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+}
+
+// Заказ
+model Order {
+    id             String      @id @default(uuid())
+    userId         String
+    user           User        @relation(fields: [userId], references: [id])
+    status         OrderStatus @default(PENDING)
+    totalAmount    Float
+    shippingAddress String
+    shippingCost   Float
+    paymentMethod  String?
+    paymentId      String?
+    createdAt      DateTime    @default(now())
+    updatedAt      DateTime    @updatedAt
+
+    // Связи
+    items OrderItem[]
+}
+
+// Элемент заказа
+model OrderItem {
+    id           String         @id @default(uuid())
+    orderId      String
+    order        Order          @relation(fields: [orderId], references: [id])
+    productId    String
+    product      Product        @relation(fields: [productId], references: [id])
+    variantId    String?
+    variant      ProductVariant? @relation(fields: [variantId], references: [id])
+    quantity     Int
+    priceAtTime  Float
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @updatedAt
+}
+
+// Отзыв
+model Review {
+    id        String   @id @default(uuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+    productId String
+    product   Product  @relation(fields: [productId], references: [id])
+    rating    Int
+    comment   String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    products Product[]
+}
+
+// Избранное
+model Favorite {
+    id        String   @id @default(uuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id])
+    productId String
+    product   Product  @relation(fields: [productId], references: [id])
+    createdAt DateTime @default(now())
+
+    @@unique([userId, productId])
+}
+
+// Корзина
+model CartItem {
+    id         String         @id @default(uuid())
+    userId     String
+    user       User           @relation(fields: [userId], references: [id])
+    productId  String
+    product    Product        @relation(fields: [productId], references: [id])
+    variantId  String?
+    variant    ProductVariant? @relation(fields: [variantId], references: [id])
+    quantity   Int
+    createdAt  DateTime       @default(now())
+    updatedAt  DateTime       @updatedAt
+}
+
+model Brand {
+    id          String @id @default(uuid()) // это поле для идентификатора бренда
+    name        String @unique // это поле для названия бренда
+    description String // это поле для описания бренда
+    image       String // это поле для изображения бренда
+    slug        String @unique // это поле для ссылки на бренд
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    products    Product[]
 }
 model Category {
-    id String @id @default(uuid())
-    name String @unique
+    id          String @id @default(uuid())
+    name        String @unique
     description String
-    image String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    products Product[]
-}
-model Image {       
-    id String @id @default(uuid()) // это поле для идентификатора изображения
-    url String // это поле для ссылки на изображение
-    createdAt DateTime @default(now()) // это поле для даты создания изображения
-    updatedAt DateTime @updatedAt // это поле для даты обновления изображения
-    productId String // это поле для связи с товаром
-    product Product @relation(fields: [productId], references: [id]) // это поле для связи с товаром
+    image       String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    products    Product[]
 }

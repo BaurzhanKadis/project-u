@@ -3,11 +3,31 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { InfoIcon } from "lucide-react";
 import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
+// import { PrismaClient } from "@prisma/client";
+
+// const prisma = new PrismaClient();
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.getUser();
+  // if (data?.user && data?.user.email && data?.user.user_metadata.name) {
+  // const existingUser = await prisma.user.findUnique({
+  //   where: { id: data.user.id },
+  // });
+  // if (!existingUser) {
+  //   const user = await register(
+  //     data.user.id,
+  //     data.user.email,
+  //     data.user.user_metadata.name,
+  //     ""
+  //   );
+  //   console.log("Новый пользователь создан:", user);
+  // } else {
+  //   console.log("Пользователь уже существует:", existingUser);
+  // }
+  // }
+  // console.log(data);
   if (error || !data?.user) {
     redirect("/auth/login");
   }
