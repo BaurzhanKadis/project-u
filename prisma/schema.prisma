@@ -116,12 +116,12 @@ model Product {
     updatedAt       DateTime @updatedAt
 
     // Связи
-    variants    ProductVariant[]
-    images      ProductImage[]
-    orderItems  OrderItem[]
-    reviews     Review[]
-    favorites   Favorite[]
-    cartItems   CartItem[]
+    variants    ProductVariant[] // Варианты товара
+    images      ProductImage[] // Изображения товара
+    orderItems  OrderItem[] // Элементы заказа
+    reviews     Review[] // Отзывы
+    favorites   Favorite[] // Избранное
+    cartItems   CartItem[] // Корзина
 }
 
 // Вариант товара
