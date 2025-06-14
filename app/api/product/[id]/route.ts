@@ -12,10 +12,13 @@ import { NextRequest, NextResponse } from "next/server";
 //   return NextResponse.json(product);
 // }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+export async function GET(request: NextRequest, { params }: Props) {
   const { id } = params;
   const product = await prisma.product.findUnique({
     where: {
