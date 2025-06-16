@@ -1,7 +1,22 @@
 import axios from "axios";
 
+const getBaseUrl = () => {
+  if (typeof window !== "undefined") {
+    // Браузер должен использовать относительный путь
+    return "/api";
+  }
+  // Сервер должен использовать абсолютный путь
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api`;
+  }
+  return (
+    (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000") +
+    (process.env.NEXT_PUBLIC_API_URL || "/api")
+  );
+};
+
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: getBaseUrl(),
   withCredentials: true,
 });
 
