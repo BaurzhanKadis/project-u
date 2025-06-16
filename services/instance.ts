@@ -1,22 +1,7 @@
 import axios from "axios";
 
-const getBaseUrl = () => {
-  if (typeof window !== "undefined") {
-    // Браузер должен использовать относительный путь
-    return "/api";
-  }
-  // Сервер должен использовать абсолютный путь
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api`;
-  }
-  return (
-    (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000") +
-    (process.env.NEXT_PUBLIC_API_URL || "/api")
-  );
-};
-
 export const axiosInstance = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
 });
 
@@ -31,23 +16,23 @@ axiosInstance.interceptors.request.use(
 );
 
 // Добавим интерцептор для ответов, чтобы логировать проблемы
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response) {
-      console.error("API Error:", error.response.status, error.response.data);
+// axiosInstance.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response) {
+//       console.error("API Error:", error.response.status, error.response.data);
 
-      // Если получаем 401, можно перенаправить на логин
-      if (error.response.status === 401 && typeof window !== "undefined") {
-        console.log("Unauthorized, redirecting to login...");
-        // Но не перенаправляем автоматически здесь, пусть компонент решает
-      }
-    } else if (error.request) {
-      console.error("API Error: No response received", error.request);
-    } else {
-      console.error("API Error:", error.message);
-    }
+//       // Если получаем 401, можно перенаправить на логин
+//       if (error.response.status === 401 && typeof window !== "undefined") {
+//         console.log("Unauthorized, redirecting to login...");
+//         // Но не перенаправляем автоматически здесь, пусть компонент решает
+//       }
+//     } else if (error.request) {
+//       console.error("API Error: No response received", error.request);
+//     } else {
+//       console.error("API Error:", error.message);
+//     }
 
-    return Promise.reject(error);
-  }
-);
+//     return Promise.reject(error);
+//   }
+// );
