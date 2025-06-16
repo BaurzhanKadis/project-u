@@ -2,18 +2,18 @@ import axios from "axios";
 
 export const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true,
+  withCredentials: true, // это что?
 });
 
-// Добавим интерцептор для запросов, чтобы сохранять куки
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // Включаем куки с каждым запросом
-    config.withCredentials = true;
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// // Добавим интерцептор для запросов, чтобы сохранять куки
+// axiosInstance.interceptors.request.use(
+//   (config) => {
+//     // Включаем куки с каждым запросом
+//     config.withCredentials = true;
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
 
 // Добавим интерцептор для ответов, чтобы логировать проблемы
 // axiosInstance.interceptors.response.use(
