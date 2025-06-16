@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { Product } from "@prisma/client";
 import { Api } from "@/services/api-client";
+
 interface ProductStore {
   products: Product[];
   setProducts: (products: Product[]) => void;

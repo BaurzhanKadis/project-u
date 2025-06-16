@@ -4,23 +4,23 @@ import { User } from "@prisma/client";
 import { createClient } from "@/lib/supabase/client";
 
 export const getCurrentUser = async (): Promise<User | null> => {
-  const supabase = createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  if (error || !user) {
-    console.error("Ошибка при получении пользователя:", error);
-    return null;
-  } else {
-    try {
-      const response = await axiosInstance.get<User>(ApiRoutes.USER + user.id);
-      return response.data;
-    } catch (error) {
-      console.error("API client: ошибка при получении пользователя:", error);
-      throw error;
+    if (error || !user) {
+      console.error("Ошибка при получении пользователя:", error);
+      return null;
     }
+
+    const response = await axiosInstance.get<User>(ApiRoutes.USER + user.id);
+    return response.data;
+  } catch (error) {
+    console.error("API client: ошибка при получении пользователя:", error);
+    return null;
   }
 };
 

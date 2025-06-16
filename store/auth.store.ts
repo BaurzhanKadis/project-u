@@ -36,7 +36,13 @@ export const useUserStore = create<UserStore>()(
           set({ user: null });
         }
       },
-      clearUser: () => set({ user: null }),
+      clearUser: () => {
+        set({ user: null });
+        // Очищаем данные из localStorage
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("user-storage");
+        }
+      },
     }),
     {
       name: "user-storage",
