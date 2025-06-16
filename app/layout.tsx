@@ -5,6 +5,7 @@ import "./globals.css";
 import { Header, Footer } from "@/components/layout";
 import { Container } from "@/components/shared/container";
 import { ProductProvider } from "@/components/providers/product-provider";
+import { UserProvider } from "@/components/providers/user-provider";
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
@@ -30,20 +31,22 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${mPlus1p.className} antialiased`}>
-        <ProductProvider>
-          <Header />
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Container>
-              <main>{children}</main>
-            </Container>
-            <Footer />
-          </ThemeProvider>
-        </ProductProvider>
+        <UserProvider>
+          <ProductProvider>
+            <Header />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <Container>
+                <main>{children}</main>
+              </Container>
+              <Footer />
+            </ThemeProvider>
+          </ProductProvider>
+        </UserProvider>
       </body>
     </html>
   );

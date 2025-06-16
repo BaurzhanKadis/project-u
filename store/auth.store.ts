@@ -1,41 +1,46 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { User } from "@/lib/types";
-// import { Api } from "@/services/api-client";
-
-// interface AuthStore {
-//   isAuthenticated: boolean; // это поле для проверки авторизации
-//   setIsAuthenticated: (isAuthenticated: boolean) => void; // это поле для установки авторизации
-// }
-
-// export const useAuthStore = create<AuthStore>((set) => ({
-//   isAuthenticated: false,
-//   setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
-// }));
+import { Api } from "@/services/api-client";
 
 interface UserStore {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  // fetchUser: (user: {
-  //   id: string;
-  //   email: string;
-  //   name: string;
-  // }) => Promise<void>;
+  user:
+    | (Pick<User, "id" | "email" | "name" | "role"> & { image: string | null })
+    | null;
+  setUser: (
+    user:
+      | (Pick<User, "id" | "email" | "name" | "role"> & {
+          image: string | null;
+        })
+      | null
+  ) => void;
+  fetchUser: () => Promise<void>;
+  clearUser: () => void;
 }
 
-export const useUserStore = create<UserStore>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
-  // fetchUser: async (user) => {
-  //   try {
-  //     const response = await Api.auth.register(
-  //       user.id,
-  //       user.email,
-  //       user.name,
-  //       ""
-  //     );
-  //     set({ user: response as User });
-  //   } catch (error) {
-  //     console.error("Ошибка при регистрации:", error);
-  //   }
-  // },
-}));
+export const useUserStore = create<UserStore>()(
+  persist(
+    (set) => ({
+      user: null,
+      setUser: (user) => set({ user }),
+      fetchUser: async () => {
+        try {
+          const response = await Api.user.getCurrentUser();
+          if (response) {
+            // Сохраняем только необходимые данные
+            const { id, email, name, role, image } = response;
+            set({ user: { id, email, name, role, image } });
+          }
+        } catch (error) {
+          console.error("Ошибка при получении пользователя:", error);
+          set({ user: null });
+        }
+      },
+      clearUser: () => set({ user: null }),
+    }),
+    {
+      name: "user-storage",
+      partialize: (state) => ({ user: state.user }), // Сохраняем только user
+    }
+  )
+);

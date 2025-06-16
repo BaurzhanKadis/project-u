@@ -27,7 +27,7 @@ export default async function ProtectedPage() {
   //   console.log("Пользователь уже существует:", existingUser);
   // }
   // }
-  // console.log(data);
+  console.log(data);
   if (error || !data?.user) {
     redirect("/auth/login");
   }

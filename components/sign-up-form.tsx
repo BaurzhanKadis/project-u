@@ -79,19 +79,19 @@ export function SignUpForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
+          <CardTitle className="text-2xl">Регистрация</CardTitle>
+          <CardDescription>Создайте новый аккаунт</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
               {/* Display Name */}
               <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">Имя</Label>
                 <Input
                   id="name"
                   type="name"
-                  placeholder="name"
+                  placeholder="Имя"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
@@ -124,7 +124,7 @@ export function SignUpForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
+                  <Label htmlFor="repeat-password">Повторите пароль</Label>
                 </div>
                 <Input
                   id="repeat-password"
@@ -136,13 +136,13 @@ export function SignUpForm({
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating an account..." : "Sign up"}
+                {isLoading ? "Создание аккаунта..." : "Создать аккаунт"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
+              Уже есть аккаунт?{" "}
               <Link href="/auth/login" className="underline underline-offset-4">
-                Login
+                Вход
               </Link>
             </div>
           </form>

@@ -5,8 +5,11 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { Container } from "@/components/shared/container";
+import { useUserStore } from "@/store/auth.store";
+import { Avatar } from "../ui/avatar";
 
 const Header = () => {
+  const { user } = useUserStore();
   const navItems = [
     {
       label: "Каталог",
@@ -33,6 +36,7 @@ const Header = () => {
       href: "/faq",
     },
   ];
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/50 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <Container className="justify-center flex h-16 items-center">
@@ -100,12 +104,16 @@ const Header = () => {
             </Button>
             <Button variant="ghost" size="icon" asChild>
               <Link href="/dashboard">
-                <Image
-                  src="/svg-icon/men.svg"
-                  alt="Личный кабинет"
-                  width={30}
-                  height={30}
-                />
+                {user ? (
+                  <Avatar userId={user.id} />
+                ) : (
+                  <Image
+                    src="/svg-icon/men.svg"
+                    alt="Личный кабинет"
+                    width={30}
+                    height={30}
+                  />
+                )}
                 <span className="sr-only">Личный кабинет</span>
               </Link>
             </Button>
