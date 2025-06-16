@@ -12,7 +12,11 @@ export default function SellerLayout({
         <SellerSidebar />
       </aside>
       {/* Основной контент */}
-      <main className="flex-1 p-4">{children}</main>
+      <main className="flex-1 p-4">
+        <div className="inner-box-lg rounded-2xl p-4 bg-[#FFFFFF]">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
