@@ -1,13 +1,27 @@
 import { prisma } from "@/prisma/prisma-client";
 import { NextRequest, NextResponse } from "next/server";
 
+// export async function GET(
+//     req: NextRequest,
+//     { params }: { params: Promise<{ id: string }> }
+//   ) {
+//     const { id } = await params;
+//     const transport = await prisma.transport.findUnique({
+//       where: {
+//         id: Number(id),
+//       },
+//     });
+//     return NextResponse.json(transport);
+//   }
+
 export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await prisma.user.findUnique({
-      where: { id: context.params.id },
+      where: { id: id },
       select: {
         id: true,
         email: true,
